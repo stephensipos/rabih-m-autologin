@@ -43,6 +43,10 @@ class Robot:
         wait = WebDriverWait(self.driver, self.options["short_wait"])
         return wait.until(EC.presence_of_element_located((By.ID, "txtPassWord")))
     
+    def get_domain_field(self):
+        wait = WebDriverWait(self.driver, self.options["short_wait"])
+        return wait.until(EC.presence_of_element_located((By.ID, "txtDomainName")))
+    
     def get_login_button(self):
         wait = WebDriverWait(self.driver, self.options["short_wait"])
         return wait.until(EC.presence_of_element_located((By.ID, "login")))
@@ -50,8 +54,9 @@ class Robot:
     def get_login_error_message(self):
         try:
             wait = WebDriverWait(self.driver, self.options["short_wait"])
-            return wait.until(EC.presence_of_element_located((By.ID, "login")))
-        except:
+            return wait.until(EC.presence_of_element_located((By.XPATH, "//div[@id='error-box' and @class='show']/span[@id='error-text']"))).text
+        except Exception as e:
+            print(e)
             return None
 
     def get_cont_button(self):
@@ -85,18 +90,19 @@ class Robot:
 
         return body_class == "loginPageLoaded"
 
-    def login(self, username: str, password: str):
+    def login(self, username: str, password: str, domain: str):
         self.navigate(url=self.url + "/login/login.html")
 
         self.get_username_field().send_keys(username)
         self.get_password_field().send_keys(password)
+        self.get_domain_field().send_keys(domain)
 
         self.click(self.get_login_button())
         sleep(1)
         login_error_message = self.get_login_error_message()
         
         if login_error_message is not None:
-            logger.warn(login_error_message.text)
+            logger.warn(login_error_message)
 
             cont_button = self.get_cont_button()
             if cont_button is not None and cont_button.is_displayed:

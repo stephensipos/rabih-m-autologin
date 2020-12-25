@@ -19,7 +19,7 @@ def get_driver_factory(webdriver):
     else:
         raise ValueError("Unsupported webdriver: " + webdriver)
 
-def main(webdriver, url, username, password, fullscreen=True, **robot_args):
+def main(webdriver, url, username, password, domain, fullscreen=True, **robot_args):
 
     driver_factory = get_driver_factory(webdriver)
 
@@ -32,10 +32,10 @@ def main(webdriver, url, username, password, fullscreen=True, **robot_args):
         with Robot(driver=driver, url=url, **robot_args) as robot:
             try:
                 while True:
-                    if robot.login(username, password):
+                    if robot.login(username, password, domain):
                         while True:
                             if robot.login_required:
-                                robot.login(username, password)
+                                robot.login(username, password, domain)
                             else:
                                 sleep(1)
                     else:
